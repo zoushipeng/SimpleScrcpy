@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">SimpleScrcpy</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="toggleRecordingOn">Start recording</string>
+
+    <string name="cameraOutputFileLabel_text">Output file:</string>
+    <string name="cameraOutputFile_text">[filename]</string>
+
+
+    <string-array name="cameraFilterNames">
+        <item>Normal</item>
+        <item>Black &amp; white</item>
+        <item>Filter: blur</item>
+        <item>Filter: sharpen</item>
+        <item>Filter: edge detect</item>
+        <item>Filter: emboss</item>
+    </string-array>
+
+    <string name="toggleRecordingOff">Stop recording</string>
+
+    <string name="capture">Capture</string>
+    <string name="secondsOfVideo">%1$.3f seconds of video</string>
+    <string name="nowRecording">" [RECORDING]"</string>
+    <string name="nowSaving">" [saving]"</string>
+    <string name="recordingSucceeded">Recording succeeded</string>
+    <string name="recordingFailed">Recording FAILED (err=%1$d)</string>
+
+
+    <string name="glesVersionLabel">"GLES version: "</string>
+    <string name="glesVersionValue">"?"</string>
+    <string name="frameRateLabel">"Frame rate: "</string>
+    <string name="frameRateFormat">"%1$.3f fps (%2$d dropped)"</string>
+    <string name="recDrawTwice">Rec: draw twice</string>
+    <string name="recOffscreen">Rec: FBO blit x2</string>
+    <string name="recFramebuffer">Rec: glBlitFramebuffer [hosed]</string>
+
+</resources>
