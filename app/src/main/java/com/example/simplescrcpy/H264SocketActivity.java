@@ -51,6 +51,7 @@ public class H264SocketActivity extends Activity implements SurfaceTexture.OnFra
 
     private SocketChannel mClient = null;
     private ServerThread mServerThread;
+    private Thread mThread;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,7 +73,8 @@ public class H264SocketActivity extends Activity implements SurfaceTexture.OnFra
         mGLView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         mServerThread = new ServerThread(mCameraHandler);
-        new Thread(mServerThread).start();
+        mThread = new Thread(mServerThread);
+        mThread.start();
     }
 
     @Override
@@ -120,6 +122,10 @@ public class H264SocketActivity extends Activity implements SurfaceTexture.OnFra
         mCameraHandler.invalidateHandler();     // paranoia
         if(mServerThread != null){
             mServerThread.running = false;
+            mServerThread.exit();
+        }
+        if(mThread != null && mThread.isAlive()){
+            mThread.interrupt();
         }
     }
 
@@ -144,6 +150,7 @@ public class H264SocketActivity extends Activity implements SurfaceTexture.OnFra
         mRecordingEnabled = !mRecordingEnabled;
         if(!mRecordingEnabled){
             unused.setEnabled(false);
+            mClient = null;
         }
         mGLView.queueEvent(new Runnable() {
             @Override public void run() {
@@ -353,30 +360,43 @@ public class H264SocketActivity extends Activity implements SurfaceTexture.OnFra
 
         @Override
         public void run() {
-            SocketChannel client = null;
-            try {
-                Log.e(TAG, "waiting connect");
-                client = channel.accept();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (client == null) {
-                Log.e(TAG, "client null. exit");
-                return;
-            }
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            while(running){
+                SocketChannel client = null;
                 try {
-                    String address = client.getRemoteAddress().toString();
-                    Log.e(TAG, address + " connected ");
+                    Log.e(TAG, "waiting connect");
+                    client = channel.accept();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (client == null) {
+                    Log.e(TAG, "client null. exit");
+                    return;
+                }
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    try {
+                        String address = client.getRemoteAddress().toString();
+                        Log.e(TAG, address + " connected ");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mHandle.sendMessage(mHandle.obtainMessage(
+                        CameraHandler.MSG_SET_SOCKET_CHANNEL, client));
+            }
+            Log.e(TAG, "run: exit");
+        }
+
+        public void exit(){
+            if(channel != null){
+                try {
+                    channel.socket().close();
+                    channel.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            mHandle.sendMessage(mHandle.obtainMessage(
-                    CameraHandler.MSG_SET_SOCKET_CHANNEL, client));
         }
     }
-
 }
 
 /**
@@ -677,10 +697,10 @@ class MyCameraSurfaceRenderer implements GLSurfaceView.Renderer {
         mFullScreen.drawFrame(mTextureId, mSTMatrix);
 
         // Draw a flashing box if we're recording.  This only appears on screen.
-        showBox = (mRecordingStatus == RECORDING_ON);
-        if (showBox && (++mFrameCount & 0x04) == 0) {
-            drawBox();
-        }
+//        showBox = (mRecordingStatus == RECORDING_ON);
+//        if (showBox && (++mFrameCount & 0x04) == 0) {
+//            drawBox();
+//        }
     }
 
     /**
